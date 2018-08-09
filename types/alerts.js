@@ -1,0 +1,4 @@
+module.exports = {
+  ADD_ALERT: 'ALERTS/ADD_ALERT',
+  DISMISS_ALERT: 'ALERTS/DISMISS_ALERT',
+};

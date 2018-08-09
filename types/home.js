@@ -1,0 +1,3 @@
+module.exports = {
+  HAVE_PROMPTED_TOUCH_ID: 'HOME/HAVE_PROMPTED_TOUCH_ID',
+};
