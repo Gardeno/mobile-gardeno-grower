@@ -34,7 +34,7 @@ class AnonymousHeader extends React.Component {
   };
 
   render() {
-    return <View style={{height: 100, position: 'absolute', left: 0, top: 0, right: 0, backgroundColor: '#79dea8'}}>
+    return <View style={{height: STATUS_BAR_HEIGHT + 50, position: 'absolute', left: 0, top: 0, right: 0, backgroundColor: '#79dea8'}}>
       <View style={{flex: 1, flexDirection: 'row', paddingTop: STATUS_BAR_HEIGHT}}>
         <View style={{width: '25%', height: '100%'}}>
           <TouchableOpacity style={{flex: 1, justifyContent: 'center', paddingLeft: 14}} onPress={this.onBackPressed}>
@@ -43,7 +43,7 @@ class AnonymousHeader extends React.Component {
         </View>
         <View style={{width: '50%', height: '100%'}}>
           <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={{color: 'white', fontSize: 20, fontWeight: 'bold'}}>
+            <Text style={{color: 'white', fontSize: 16, fontWeight: 'bold'}}>
               {this.props.title}
             </Text>
           </View>

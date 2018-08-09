@@ -15,6 +15,8 @@ import {
 import { SERVER_AUTHENTICATION_EXPIRES_SERVICE, } from '../config';
 import * as Keychain from 'react-native-keychain';
 
+import { postToApi } from './helpers';
+
 export const loggedIn = ({  }) => ({
   type: LOGGED_IN,
 });
@@ -44,5 +46,21 @@ export const receivedToken = ({ authToken }) => {
   return {
     type: RECEIVED_TOKEN,
     authToken,
+  }
+};
+
+export const submitRegistration = ({email, firstName, lastName, password}, callback) => {
+  return (dispatch) => {
+    postToApi({
+      url: '/accounts/register',
+      body: {
+        email,
+        firstName,
+        lastName,
+        password,
+      },
+      dispatch,
+      failSilently: true,
+    }, callback)
   }
 };
