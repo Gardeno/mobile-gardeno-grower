@@ -13,9 +13,9 @@ import thunkMiddleware from 'redux-thunk';
 import rootReducer from './reducers'
 
 const persistConfig = {
-  key: 'root-1.0.2',
+  key: 'root-1.0.3',
   storage,
-  whitelist: ['auth'],
+  whitelist: [],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

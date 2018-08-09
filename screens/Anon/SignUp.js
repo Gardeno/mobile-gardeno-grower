@@ -24,7 +24,9 @@ import AnonymousHeader from './Header';
 import { STATUS_BAR_HEIGHT } from '../../shared/styles';
 
 import { addAlert } from '../../actions/alerts';
-import { submitRegistration } from '../../actions/auth';
+import { submitRegistration, loggedIn } from '../../actions/auth';
+
+import { persistToKeychain } from '../../shared/helpers';
 
 const styles = {
   baseTextInputWrapper: {
@@ -108,8 +110,15 @@ class SignUp extends React.Component {
           this.props.dispatch(addAlert({
             message: error,
           }))
+        } else {
+          const authToken = response.data.token;
+          persistToKeychain({
+            authToken,
+          });
+          this.props.dispatch(loggedIn({
+            authToken,
+          }))
         }
-
       }));
     });
   };
@@ -192,7 +201,8 @@ class SignUp extends React.Component {
             </View>
           </View>
           <View style={{height: inputRowHeight}}>
-            <TouchableOpacity style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} onPress={this.goBackToSignIn}>
+            <TouchableOpacity style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+                              onPress={this.goBackToSignIn}>
               <Text>Sign In to Existing Account</Text>
             </TouchableOpacity>
           </View>
