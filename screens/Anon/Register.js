@@ -34,7 +34,16 @@ const styles = {
 
 const inputRowHeight = 45;
 
+const BORDER_COLOR = '#323e48';
+
 class Login extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: false,
+    }
+  }
 
   componentDidMount() {
     this.refs.textInputEmailAddress.focus();
@@ -55,16 +64,31 @@ class Login extends React.Component {
   };
 
   onSubmit = () => {
-    alert('submit');
+    this.setState({
+      isLoading: true,
+    });
+    setTimeout(() => {
+      this.setState({
+        isLoading: false,
+      });
+    }, 500);
   };
 
   render() {
+
+    const { isLoading } = this.state;
+
     return <View style={{flex: 1, backgroundColor: '#57b6b2'}}>
       <AnonymousHeader navigation={this.props.navigation} title={'Register'}/>
-      <View style={{position: 'absolute', top: 100, left: 0, right: 0, bottom: 0}}>
-        <View style={{flex: 1, padding: 8}}>
+      <ScrollView style={{position: 'absolute', top: 100, left: 0, right: 0, bottom: 0}}>
+        <View style={{flex: 1, paddingLeft: 8, paddingRight: 8, paddingBottom: 8}}>
+          <View style={{height: 90}}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <Image source={require('../../images/logo-inline-with-text.png')} style={{height: 90, width: '100%'}} />
+            </View>
+          </View>
           <View
-            style={Object.assign({}, styles.baseTextInputWrapper, {borderRadius: 4, borderColor: '#666', borderWidth: 1})}>
+            style={Object.assign({}, styles.baseTextInputWrapper, {borderRadius: 4, borderColor: BORDER_COLOR, borderWidth: 1})}>
             <TextInput blurOnSubmit={false} onSubmitEditing={this.onTextInputSubmit('textInputEmailAddress')}
                        returnKeyType="next"
                        autoCorrect={false} autoCapitalize="none" keyboardType="email-address" textContentType="none"
@@ -75,7 +99,7 @@ class Login extends React.Component {
               <View style={{flex: 1, flexDirection: 'row'}}>
                 <View style={{width: '50%'}}>
                   <View
-                    style={Object.assign({}, styles.baseTextInputWrapper, {borderTopLeftRadius: 4, borderColor: '#666', borderWidth: 1, borderBottomWidth: 0})}>
+                    style={Object.assign({}, styles.baseTextInputWrapper, {borderTopLeftRadius: 4, borderColor: BORDER_COLOR, borderWidth: 1, borderBottomWidth: 0})}>
                     <TextInput blurOnSubmit={false} onSubmitEditing={this.onTextInputSubmit('textInputFirstName')}
                                returnKeyType="next" autoCorrect={false} textContentType="none"
                                ref="textInputFirstName" placeholder={'First Name'} style={{fontSize: 14}}/>
@@ -83,7 +107,7 @@ class Login extends React.Component {
                 </View>
                 <View style={{width: '50%'}}>
                   <View
-                    style={Object.assign({}, styles.baseTextInputWrapper, {borderTopRightRadius: 4, borderColor: '#666', borderWidth: 1, borderBottomWidth: 0, borderLeftWidth: 0})}>
+                    style={Object.assign({}, styles.baseTextInputWrapper, {borderTopRightRadius: 4, borderColor: BORDER_COLOR, borderWidth: 1, borderBottomWidth: 0, borderLeftWidth: 0})}>
                     <TextInput blurOnSubmit={false} onSubmitEditing={this.onTextInputSubmit('textInputLastName')}
                                returnKeyType="next" autoCorrect={false}
                                textContentType="none"
@@ -93,7 +117,7 @@ class Login extends React.Component {
               </View>
             </View>
             <View
-              style={Object.assign({}, styles.baseTextInputWrapper, {borderBottomLeftRadius: 4, borderBottomRightRadius: 4, borderColor: '#666', borderWidth: 1})}>
+              style={Object.assign({}, styles.baseTextInputWrapper, {borderBottomLeftRadius: 4, borderBottomRightRadius: 4, borderColor: BORDER_COLOR, borderWidth: 1})}>
               <TextInput blurOnSubmit={false} onSubmitEditing={this.onTextInputSubmit('textInputPassword')}
                          returnKeyType="go"
                          secureTextEntry={true} textContentType="none"
@@ -102,7 +126,7 @@ class Login extends React.Component {
           </View>
           <View style={{marginTop: 8}}>
             <View style={{height: inputRowHeight}}>
-              <TouchableOpacity style={{flex: 1, backgroundColor: '#f09f54', borderRadius: 4, borderWidth: 1, borderColor: '#666'}} onPress={this.onSubmit}>
+              <TouchableOpacity style={{flex: 1, backgroundColor: '#f09f54', borderRadius: 4, borderWidth: 1, borderColor: BORDER_COLOR}} onPress={this.onSubmit}>
                 <View style={{position: 'absolute', left: 14, top: 0, bottom: 0}}>
                   <View style={{flex: 1, justifyContent: 'center'}}>
                     <Text style={{color: 'white', fontWeight: 'bold', fontSize: 14}}>Submit Registration</Text>
@@ -110,14 +134,14 @@ class Login extends React.Component {
                 </View>
                 <View style={{position: 'absolute', right: 14, top: 0, bottom: 0}}>
                   <View style={{flex: 1, justifyContent: 'center'}}>
-                    <Ionicons name="ios-arrow-forward" size={20} color={'white'}/>
+                    {isLoading ? <ActivityIndicator size="small" color={'white'} /> : <Ionicons name="ios-arrow-forward" size={20} color={'white'}/>}
                   </View>
                 </View>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   }
 
