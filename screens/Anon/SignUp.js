@@ -27,6 +27,7 @@ import { addAlert } from '../../actions/alerts';
 import { submitRegistration, loggedIn } from '../../actions/auth';
 
 import { persistToKeychain } from '../../shared/helpers';
+import { StackActions, NavigationActions } from 'react-navigation';
 
 const styles = {
   baseTextInputWrapper: {
@@ -117,7 +118,13 @@ class SignUp extends React.Component {
           });
           this.props.dispatch(loggedIn({
             authToken,
-          }))
+          }));
+          this.props.navigation.dispatch(StackActions.reset({
+            index: 0,
+            actions: [
+              NavigationActions.navigate({ routeName: 'AuthenticatedHome' }),
+            ]
+          }));
         }
       }));
     });
