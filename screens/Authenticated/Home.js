@@ -1,58 +1,108 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, TouchableHighlight, StyleSheet, FlatList, Dimensions, Platform, Image, Button, } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TouchableHighlight,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  Platform,
+  Image,
+  Button,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import Header from './Header';
 
-import { BOTTOM_BAR_HEIGHT } from '../../shared/styles';
+import { BOTTOM_BAR_HEIGHT, STATUS_BAR_HEIGHT, } from '../../shared/styles';
+import { removeFromKeychain } from '../../shared/helpers';
 
-const styles = StyleSheet.create({
+import { loadUser, loadedUser } from '../../actions/Authenticated/home';
+import { loggedOut } from '../../actions/auth';
+import { addAlert } from '../../actions/alerts';
 
-  MainContainer: {
-    justifyContent: 'center',
-    flex: 1,
-  },
-
-  GridViewBlockStyle: {
-    flex: 1,
-    height: 125,
-    margin: 0,
-    padding: 0,
-    marginBottom: 8,
-  },
-
-  GridViewInsideTextItemStyle: {
-    position: 'absolute',
-    left: 0,
-    bottom: 0,
-    right: 0,
-    height: 30,
-    borderTopWidth: 1,
-    borderTopColor: '#468C98',
-  },
-
-  sectionHeader: {
-    height: 20,
-    width: '100%',
-    flex: 1,
-    justifyContent: 'center',
-    paddingLeft: 8,
-  }
-
-});
+import { StackActions, NavigationActions } from 'react-navigation';
 
 class AuthenticatedHomeScreenClass extends React.Component {
 
-  componentDidMount() {
-    //this.onSignInPressed();
+  constructor(props) {
+    super(props);
+    this.state = {
+      showTabBar: false,
+      activeTab: null,
+    }
   }
 
+  setup = async() => {
+    this.props.dispatch(loadUser(async(error, response) => {
+      console.log(error);
+      console.log(response);
+      if (error || !response) {
+        await removeFromKeychain();
+        this.props.dispatch(addAlert({ message: 'Something went wrong. Please login again.' }))
+        this.props.dispatch(loggedOut());
+        this.props.navigation.dispatch(StackActions.reset({
+          index: 0,
+          actions: [
+            NavigationActions.navigate({ routeName: 'Home' }),
+          ],
+          key: null,
+        }));
+      } else {
+        this.props.dispatch(loadedUser(response.data));
+        const activeTab = (response.data.invitations.length > 0 && response.data.grows.length === 0) ? 'settings' : 'home';
+        this.setState({
+          showTabBar: true,
+          activeTab,
+        })
+      }
+    }));
+  };
+
+  componentWillMount() {
+    this.setup();
+  }
+
+  changeTab = (activeTab) => {
+    return () => {
+      this.setState({
+        activeTab,
+      })
+    }
+  };
+
   render() {
-    const { isEditing } = this.props;
+    const { showTabBar, activeTab } = this.state;
     return (
       <View style={{flex: 1, backgroundColor: '#57b6b2'}}>
-        <Header title={'OMG AUTH'} navigation={this.props.navigation} />
-
+        <Header navigation={this.props.navigation}/>
+        {(activeTab === 'home') &&
+        <View style={{position: 'absolute', top: STATUS_BAR_HEIGHT + 50, left: 0, right: 0, bottom: 0}}>
+          <Text>Home</Text>
+        </View>}
+        {(activeTab === 'settings') &&
+        <View style={{position: 'absolute', top: STATUS_BAR_HEIGHT + 50, left: 0, right: 0, bottom: 0}}>
+          <Text>Settings</Text>
+        </View>}
+        {showTabBar && <View
+          style={{position: 'absolute', bottom: 0, left: 0, right: 0, height: 60 + BOTTOM_BAR_HEIGHT, backgroundColor: '#79dea8', paddingBottom: BOTTOM_BAR_HEIGHT}}>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <View style={{width: '50%'}}>
+              <TouchableOpacity style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
+                                onPress={this.changeTab('home')}>
+                <Ionicons name={activeTab === 'home' ? 'ios-home' : 'ios-home-outline'} size={32} color={'black'}/>
+              </TouchableOpacity>
+            </View>
+            <View style={{width: '50%'}}>
+              <TouchableOpacity style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
+                                onPress={this.changeTab('settings')}>
+                <Ionicons name={activeTab === 'settings' ? 'ios-settings' : 'ios-settings-outline'} size={32}
+                          color={'black'}/>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>}
       </View>
     );
   }

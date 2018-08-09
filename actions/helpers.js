@@ -57,7 +57,7 @@ export const postToApi = ({ url, body, dispatch, getState, failSilently=false },
     .catch(_handleError(dispatch, callback, failSilently));
 };
 
-export const getFromApi = ({ url, dispatch, getState }, callback) => {
+export const getFromApi = ({ url, dispatch, getState, failSilently=false }, callback) => {
   const options = {
     method: 'GET',
     headers: {
@@ -73,7 +73,7 @@ export const getFromApi = ({ url, dispatch, getState }, callback) => {
     .then((response) => {
       return callback(null, response);
     })
-    .catch(_handleError(dispatch, callback));
+    .catch(_handleError(dispatch, callback, failSilently));
 };
 
 export const deleteFromApi = ({ url, dispatch, getState }, callback) => {

@@ -2,6 +2,14 @@ import { loggedIn, } from '../actions/auth';
 import { KEYCHAIN_USERNAME } from '../config';
 
 
+export const removeFromKeychain = async() => {
+  try {
+    Expo.SecureStore.deleteItemAsync(KEYCHAIN_USERNAME);
+  } catch (exception) {
+    console.warn('Unable to remove from keychain: ', exception);
+  }
+};
+
 export const persistToKeychain = async({ authToken }) => {
   try {
     await Expo.SecureStore.setItemAsync(KEYCHAIN_USERNAME, JSON.stringify({

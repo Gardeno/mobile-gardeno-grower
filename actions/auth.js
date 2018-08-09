@@ -12,8 +12,6 @@ import {
   DELETED_ACCOUNT,
 } from '../types/auth'
 
-import { KEYCHAIN_USERNAME, } from '../config';
-
 import { postToApi } from './helpers';
 
 export const loggedIn = ({ authToken }) => ({
@@ -22,8 +20,6 @@ export const loggedIn = ({ authToken }) => ({
 });
 
 export const loggedOut = () => {
-  //We delete the expiration of our key so that users are forced to receive another two factor code (and server auth token)
-  Expo.SecureStore.deleteItemAsync(KEYCHAIN_USERNAME);
   return {
     type: LOGGED_OUT,
   }

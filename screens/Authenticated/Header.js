@@ -25,12 +25,7 @@ import { Ionicons } from '@expo/vector-icons';
 class AuthenticatedHeader extends React.Component {
 
   static propTypes = {
-    title: PropTypes.string.isRequired,
     navigation: PropTypes.object.isRequired,
-  };
-
-  onBackPressed = () => {
-    this.props.navigation.goBack();
   };
 
   render() {
