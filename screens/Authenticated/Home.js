@@ -34,21 +34,27 @@ class AuthenticatedHomeScreenClass extends React.Component {
     }
   }
 
+  logout = async (showAlert) => {
+    await removeFromKeychain();
+    if (showAlert) {
+      this.props.dispatch(addAlert({ message: 'Something went wrong. Please login again.' }))
+    }
+    this.props.dispatch(loggedOut());
+    this.props.navigation.dispatch(StackActions.reset({
+      index: 0,
+      actions: [
+        NavigationActions.navigate({ routeName: 'Home' }),
+      ],
+      key: null,
+    }));
+  };
+
   setup = async() => {
     this.props.dispatch(loadUser(async(error, response) => {
       console.log(error);
       console.log(response);
       if (error || !response) {
-        await removeFromKeychain();
-        this.props.dispatch(addAlert({ message: 'Something went wrong. Please login again.' }))
-        this.props.dispatch(loggedOut());
-        this.props.navigation.dispatch(StackActions.reset({
-          index: 0,
-          actions: [
-            NavigationActions.navigate({ routeName: 'Home' }),
-          ],
-          key: null,
-        }));
+        await this.logout(true);
       } else {
         this.props.dispatch(loadedUser(response.data));
         const activeTab = (response.data.invitations.length > 0 && response.data.grows.length === 0) ? 'settings' : 'home';
@@ -72,6 +78,10 @@ class AuthenticatedHomeScreenClass extends React.Component {
     }
   };
 
+  pressedLogout = () => {
+    this.logout(false);
+  };
+
   render() {
     const { showTabBar, activeTab } = this.state;
     return (
@@ -79,11 +89,15 @@ class AuthenticatedHomeScreenClass extends React.Component {
         <Header navigation={this.props.navigation}/>
         {(activeTab === 'home') &&
         <View style={{position: 'absolute', top: STATUS_BAR_HEIGHT + 50, left: 0, right: 0, bottom: 0}}>
-          <Text>Home</Text>
         </View>}
         {(activeTab === 'settings') &&
         <View style={{position: 'absolute', top: STATUS_BAR_HEIGHT + 50, left: 0, right: 0, bottom: 0}}>
-          <Text>Settings</Text>
+          <View style={{height: 75, padding: 14}}>
+            <TouchableOpacity onPress={this.pressedLogout}
+              style={{flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', borderRadius: 4}}>
+              <Text style={{fontSize: 18}}>Log Out</Text>
+            </TouchableOpacity>
+          </View>
         </View>}
         {showTabBar && <View
           style={{position: 'absolute', bottom: 0, left: 0, right: 0, height: 60 + BOTTOM_BAR_HEIGHT, backgroundColor: '#79dea8', paddingBottom: BOTTOM_BAR_HEIGHT}}>
