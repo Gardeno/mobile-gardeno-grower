@@ -95,8 +95,8 @@ class HomeScreenClass extends React.Component {
     }
   };
 
-  onRegisterPressed = () => {
-    this.props.navigation.navigate('Register');
+  onSignUpPressed = () => {
+    this.props.navigation.navigate('SignUp');
   };
 
   onSignInPressed = () => {
@@ -104,7 +104,7 @@ class HomeScreenClass extends React.Component {
   };
 
   componentDidMount() {
-    this.onRegisterPressed();
+    this.onSignUpPressed();
   }
 
   render() {
@@ -132,8 +132,8 @@ class HomeScreenClass extends React.Component {
             </View>
             <View style={{width: '50%'}}>
               <View style={{position: 'absolute', left: 4, top: 10, right: 8, bottom: 10, backgroundColor: '#79dea8', borderRadius: 4}}>
-                <TouchableOpacity style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} onPress={this.onRegisterPressed}>
-                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Register</Text>
+                <TouchableOpacity style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} onPress={this.onSignUpPressed}>
+                  <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Sign Up</Text>
                 </TouchableOpacity>
               </View>
             </View>

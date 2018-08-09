@@ -52,7 +52,7 @@ export const receivedToken = ({ authToken }) => {
 export const submitRegistration = ({email, firstName, lastName, password}, callback) => {
   return (dispatch) => {
     postToApi({
-      url: '/accounts/register',
+      url: '/accounts/signup/',
       body: {
         email,
         firstName,

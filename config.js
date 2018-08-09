@@ -1,7 +1,7 @@
 let apiUrl;
 
 if (process.env.NODE_ENV === 'production') {
-  apiUrl = 'https://api.gardeno.global';
+  apiUrl = 'https://gardeno.global';
 } else {
   apiUrl = 'https://gardeno.ngrok.io';
 }

@@ -7,7 +7,7 @@ import { createStackNavigator } from 'react-navigation';
 import Alerts from '../screens/Alerts';
 
 import Home from '../screens/Anon/Home';
-import Register from '../screens/Anon/Register';
+import SignUp from '../screens/Anon/SignUp';
 import SignIn from '../screens/Anon/SignIn';
 import AuthenticatedHome from '../screens/Anon/Home';
 import { loadKeychainData } from '../shared/helpers';
@@ -29,8 +29,8 @@ export const AppNavigator = ({ initialRouteName }) => {
     SignIn: {
       screen: SignIn,
     },
-    Register: {
-      screen: Register,
+    SignUp: {
+      screen: SignUp,
     },
     AuthenticatedHome: {
       screen: AuthenticatedHome,

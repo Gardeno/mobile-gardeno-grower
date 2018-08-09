@@ -40,7 +40,7 @@ const inputRowHeight = 45;
 
 const BORDER_COLOR = '#323e48';
 
-class Login extends React.Component {
+class SignUp extends React.Component {
 
   constructor(props) {
     super(props);
@@ -114,12 +114,16 @@ class Login extends React.Component {
     });
   };
 
+  goBackToSignIn = () => {
+    this.props.navigation.navigate('SignIn');
+  };
+
   render() {
 
     const { isLoading } = this.state;
 
     return <View style={{flex: 1, backgroundColor: '#57b6b2'}}>
-      <AnonymousHeader navigation={this.props.navigation} title={'Register'}/>
+      <AnonymousHeader navigation={this.props.navigation} title={'Sign Up'}/>
       <ScrollView style={{position: 'absolute', top: STATUS_BAR_HEIGHT + 50, left: 0, right: 0, bottom: 0}}>
         <View style={{flex: 1, paddingLeft: 8, paddingRight: 8, paddingBottom: 8}}>
           <View style={{height: 90}}>
@@ -175,7 +179,7 @@ class Login extends React.Component {
                 onPress={this.onSubmit}>
                 <View style={{position: 'absolute', left: 14, top: 0, bottom: 0}}>
                   <View style={{flex: 1, justifyContent: 'center'}}>
-                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 14}}>Submit Registration</Text>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: 14}}>Sign Up</Text>
                   </View>
                 </View>
                 <View style={{position: 'absolute', right: 14, top: 0, bottom: 0}}>
@@ -187,6 +191,11 @@ class Login extends React.Component {
               </TouchableOpacity>
             </View>
           </View>
+          <View style={{height: inputRowHeight}}>
+            <TouchableOpacity style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} onPress={this.goBackToSignIn}>
+              <Text>Sign In to Existing Account</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -196,4 +205,4 @@ class Login extends React.Component {
 
 export default connect((state) => {
   return {}
-})(Login);
+})(SignUp);
