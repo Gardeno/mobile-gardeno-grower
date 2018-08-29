@@ -89,14 +89,16 @@ class AuthenticatedHomeTabWrapperClass extends React.Component {
     const { showTabBar, activeTab } = this.state;
     return (
       <View style={{flex: 1, backgroundColor: '#57b6b2'}}>
-        <Header navigation={this.props.navigation}/>
+        {(activeTab !== 'time') &&
+          <Header navigation={this.props.navigation}/>
+        }
         {(activeTab === 'home') &&
         <View style={{position: 'absolute', top: STATUS_BAR_HEIGHT + 50, left: 0, right: 0, bottom: 0}}>
           <HomeScreen />
         </View>}
         {(activeTab === 'time') &&
-        <View style={{position: 'absolute', top: STATUS_BAR_HEIGHT + 50, left: 0, right: 0, bottom: 0}}>
-          <TimeScreen />
+        <View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
+          <TimeScreen navigation={this.props.navigation}/>
         </View>}
         {(activeTab === 'settings') &&
         <View style={{position: 'absolute', top: STATUS_BAR_HEIGHT + 50, left: 0, right: 0, bottom: 0}}>

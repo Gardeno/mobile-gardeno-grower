@@ -21,6 +21,10 @@ import Swiper from 'react-native-swiper';
 
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
+import { toggleDayOfWeek } from '../../actions/time';
+import { STATUS_BAR_HEIGHT } from '../../shared/styles';
+
+import TimeHeader from './TimeHeader';
 
 const moment = extendMoment(Moment);
 
@@ -34,20 +38,34 @@ const styles = {
   }
 };
 
-const WeekRenderer = (props) => {
+const WeekRendererComponent = ({ loaded, week, selectedDayOfWeek, dispatch }) => {
   return (<View style={{flex: 1}}>
     {
-      !props.loaded && <View style={{flex: 1, flexDirection: 'row'}}>
-        {(Array.from(props.week.range.by('day')).map((day, counter) => {
-          return <View style={{width: '14.28%', height: '100%'}}>
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <View style={{width: 32, height: 32, borderRadius: 16, backgroundColor: 'red'}}>
+      !loaded && <View style={{flex: 1, flexDirection: 'row'}}>
+        {(Array.from(week.range.by('day')).map((day, counter) => {
+          console.log(day.isSame(moment()));
+          let dayBackgroundStyle = { width: 32, height: 32, borderRadius: 16 };
+          let dayTextStyle = { color: 'black' };
+          if (day.day() === selectedDayOfWeek) {
+            if (moment().format('YYYY-MM-DD') === day.format('YYYY-MM-DD')) {
+              dayBackgroundStyle.backgroundColor = '#79dea8';
+              dayTextStyle.color = 'white';
+            } else {
+              dayBackgroundStyle.backgroundColor = 'black';
+              dayTextStyle.color = 'white';
+            }
+          }
+          return <View style={{width: '14.28%', height: '100%'}} key={`day-${day.format('YYYY-MM-DD')}`}>
+            <TouchableOpacity style={{flex: 1, alignItems: 'center', justifyContent: 'center'}} onPress={() => {
+              dispatch(toggleDayOfWeek(day.day()))
+            }}>
+              <View style={dayBackgroundStyle}>
                 <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                  <Text>{day.format('dddd')[0]}</Text>
+                  <Text style={dayTextStyle}>{day.format('dddd')[0]}</Text>
                 </View>
               </View>
               <Text style={{fontSize: 10, paddingTop: 4}}>0:00</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         }))}
       </View>
@@ -55,9 +73,19 @@ const WeekRenderer = (props) => {
   </View>)
 };
 
+const WeekRenderer = connect(({ time }) => {
+  return {
+    selectedDayOfWeek: time.selectedDayOfWeek,
+  }
+})(WeekRendererComponent);
+
 class TimeScreenClass extends React.Component {
 
   static propTypes = {};
+
+  static propTypes = {
+    navigation: PropTypes.object.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -65,7 +93,8 @@ class TimeScreenClass extends React.Component {
     this.state = {
       loadingWeeks: true,
       weeks: [],
-      loadQueue: []
+      loadQueue: [],
+      selectedDayOfWeek: moment().day(),
     }
   }
 
@@ -101,6 +130,10 @@ class TimeScreenClass extends React.Component {
     });
   };
 
+  componentWillMount() {
+    this.props.dispatch(toggleDayOfWeek(moment().day()));
+  }
+
   componentDidMount() {
     this.loadWeeksForDate(moment());
   }
@@ -114,10 +147,7 @@ class TimeScreenClass extends React.Component {
   };
 
   onMomentumScrollEnd = (e, state, context) => {
-    console.log(state.index);
     if (state.index == WEEKS_TO_LOAD || state.index == (WEEKS_TO_LOAD + 1)) {
-      console.log("RELOAD");
-      console.log();
       this.loadWeeksForDate(moment(this.state.weeks[state.index].range.start));
     }
   };
@@ -126,7 +156,8 @@ class TimeScreenClass extends React.Component {
     const { loadingWeeks } = this.state;
     return (
       <View style={{flex: 1}}>
-        <View style={{height: 65, backgroundColor: '#cde6d9'}}>
+        <TimeHeader navigation={this.props.navigation}/>
+        <View style={{marginTop: STATUS_BAR_HEIGHT + 50, height: 65, backgroundColor: '#cde6d9'}}>
           {loadingWeeks ? <View style={styles.loadingWeeks}><ActivityIndicator /></View> :
             <Swiper loadMinimal loadMinimalSize={1} showsButtons={false}
                     showsPagination={false} loop={true}
