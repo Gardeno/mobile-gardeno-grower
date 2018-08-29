@@ -9,7 +9,7 @@ import Alerts from '../screens/Alerts';
 import Home from '../screens/Anon/Home';
 import SignUp from '../screens/Anon/SignUp';
 import SignIn from '../screens/Anon/SignIn';
-import AuthenticatedHome from '../screens/Authenticated/Home';
+import AuthenticatedHomeTabs from '../screens/Authenticated/HomeTabWrapper';
 import { loadKeychainData } from '../shared/helpers';
 import { loggedIn } from '../actions/auth';
 import { addAlert } from '../actions/alerts';
@@ -33,7 +33,7 @@ export const AppNavigator = ({ initialRouteName }) => {
       screen: SignUp,
     },
     AuthenticatedHome: {
-      screen: AuthenticatedHome,
+      screen: AuthenticatedHomeTabs,
     },
   }, {
     initialRouteName,

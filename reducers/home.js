@@ -1,10 +1,15 @@
-const defaultState = { isEditing: false };
+const defaultState = { grows: [], invitations: [], };
+
+import {
+  LOADED_USER,
+} from '../types/Authenticated/home'
 
 export default function home(state = defaultState, action) {
   switch (action.type) {
-    case 'TOGGLE_EDIT':
+    case LOADED_USER:
       return Object.assign({}, state, {
-        isEditing: !state.isEditing,
+        grows: state.grows,
+        invitations: state.invitations,
       });
     default:
       return state;

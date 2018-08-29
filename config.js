@@ -3,7 +3,8 @@ let apiUrl;
 if (process.env.NODE_ENV === 'production') {
   apiUrl = 'https://gardeno.global';
 } else {
-  apiUrl = 'https://gardeno.ngrok.io';
+  //apiUrl = 'https://gardeno.ngrok.io';
+  apiUrl = 'http://localhost:8001';
 }
 
 module.exports = {
