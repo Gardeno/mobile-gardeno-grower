@@ -21,7 +21,6 @@ import {
 } from 'react-native';
 import { STATUS_BAR_HEIGHT } from '../../shared/styles';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { goToDate } from '../../actions/time';
 
 import moment from 'moment';
 
@@ -29,10 +28,11 @@ class TimeHeader extends React.Component {
 
   static propTypes = {
     navigation: PropTypes.object.isRequired,
+    onSelectedDate: PropTypes.func.isRequired,
   };
 
   jumpToToday = () => {
-    this.props.dispatch(goToDate(moment()));
+    this.props.onSelectedDate(moment().format('YYYY-MM-DD'));
   };
 
   render() {

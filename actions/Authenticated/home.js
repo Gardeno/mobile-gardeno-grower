@@ -29,7 +29,6 @@ export const loadUser = (callback) => {
       if (!error && response) {
         dispatch(loadedUser(response.data));
       }
-      console.log(response);
       callback(error, response);
     });
   }

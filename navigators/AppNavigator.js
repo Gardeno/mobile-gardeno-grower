@@ -62,7 +62,6 @@ class App extends React.Component {
     if (loadError) {
       this.props.dispatch(addAlert({ message: loadError }));
     } else {
-      console.log('token', authToken);
       if (authToken) {
         this.props.dispatch(loggedIn({ authToken }));
         this.initialRouteName = 'AuthenticatedHome';
@@ -93,7 +92,6 @@ class App extends React.Component {
     if (this.state.loading) {
       return <Loading />
     }
-    console.log('initial route name: ', this.initialRouteName);
     return (
       <View style={{flex: 1}}>
         <StatusBar barStyle={'light-content'}/>
