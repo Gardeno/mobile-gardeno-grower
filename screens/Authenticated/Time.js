@@ -193,8 +193,14 @@ class TimeScreenClass extends React.Component {
 
   onScrollEndDay = (e, state, context) => {
     if (this.draggingDay) {
-      //this.props.dispatch(goToDate(moment(this.props.selectedDate, 'YYYY-MM-DD').add(1, 'days')));
-      //console.log('SET PAGES')
+      const dayIndicies = this._getSwiperIndicies(this.dayIndex, this.daySwiper.state);
+      const newSelectedDate = moment(this.props.dayPages[dayIndicies.current], 'YYYY-MM-DD');
+      this.props.dispatch(setSelectedDate(newSelectedDate.format('YYYY-MM-DD')));
+      const fromSelectedDateIndex = (dayIndicies.direction === 1) ? dayIndicies.previous : dayIndicies.next;
+      const fromSelectedDate = moment(this.props.dayPages[fromSelectedDateIndex], 'YYYY-MM-DD');
+      if (newSelectedDate.isoWeek() !== fromSelectedDate.isoWeek()) {
+        this.weekSwiper.scrollBy(dayIndicies.direction, true);
+      }
     }
     this.dayIndex = state.index;
     this.draggingDay = false;
