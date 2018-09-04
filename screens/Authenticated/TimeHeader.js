@@ -37,12 +37,16 @@ class TimeHeader extends React.Component {
 
   render() {
     const { date } = this.props;
+    const dateMoment = moment(date, 'YYYY-MM-DD');
+    const isToday = dateMoment.format('YYYY-MM-DD') === moment().format('YYYY-MM-DD');
     return <View
       style={{height: STATUS_BAR_HEIGHT + 50, position: 'absolute', left: 0, top: 0, right: 0, backgroundColor: '#79dea8'}}>
       <View style={{flex: 1, flexDirection: 'row', paddingTop: STATUS_BAR_HEIGHT}}>
         <View style={{width: '50%', height: '100%', paddingLeft: 12}}>
           <View style={{flex: 1, justifyContent: 'center'}}>
-            <Text style={{color: 'white', fontWeight: 'bold'}}>{date}</Text>
+            <Text style={{color: 'white', fontWeight: 'bold'}}>
+              {`${isToday ? 'Today' : dateMoment.format('dddd')}, ${dateMoment.format('DD MMM')}`}
+            </Text>
           </View>
         </View>
         <View style={{width: '50%', height: '100%', paddingRight: 12}}>
