@@ -36,12 +36,13 @@ class TimeHeader extends React.Component {
   };
 
   render() {
+    const { date } = this.props;
     return <View
       style={{height: STATUS_BAR_HEIGHT + 50, position: 'absolute', left: 0, top: 0, right: 0, backgroundColor: '#79dea8'}}>
       <View style={{flex: 1, flexDirection: 'row', paddingTop: STATUS_BAR_HEIGHT}}>
         <View style={{width: '50%', height: '100%', paddingLeft: 12}}>
           <View style={{flex: 1, justifyContent: 'center'}}>
-            <Text style={{color: 'white', fontWeight: 'bold'}}>Today, Aug 23</Text>
+            <Text style={{color: 'white', fontWeight: 'bold'}}>{date}</Text>
           </View>
         </View>
         <View style={{width: '50%', height: '100%', paddingRight: 12}}>
@@ -60,6 +61,8 @@ class TimeHeader extends React.Component {
 
 }
 
-export default connect((state) => {
-  return {}
+export default connect(({ time }) => {
+  return {
+    date: time.selectedDate,
+  }
 })(TimeHeader);

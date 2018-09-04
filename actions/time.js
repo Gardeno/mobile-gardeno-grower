@@ -1,20 +1,28 @@
 import {
-  SELECTED_DAY_OF_WEEK,
-  GO_TO_DATE,
+  SELECTED_DATE,
+  SET_WEEK_PAGE_BY_INDEX,
+  SET_DAY_PAGE_BY_INDEX,
 } from '../types/Authenticated/time'
 
-
-export const toggleDayOfWeek = (dayOfWeek) => {
+export const setSelectedDate = (newDate) => {
   return {
-    type: SELECTED_DAY_OF_WEEK,
-    dayOfWeek,
+    type: SELECTED_DATE,
+    newDate,
   }
 };
 
-export const goToDate = (dateMoment) => {
+export const setWeekPageByIndex = (index, weekPage) => {
   return {
-    type: GO_TO_DATE,
-    date: dateMoment.format('YYYY-MM-DD'),
-    dayOfWeek: dateMoment.day(),
+    type: SET_WEEK_PAGE_BY_INDEX,
+    index: index,
+    page: weekPage,
+  }
+}
+
+export const setDayPageByIndex = (index, dayPage) => {
+  return {
+    type: SET_DAY_PAGE_BY_INDEX,
+    index: index,
+    page: dayPage,
   }
 };

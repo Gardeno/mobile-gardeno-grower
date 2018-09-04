@@ -21,7 +21,11 @@ import Swiper from 'react-native-swiper';
 
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
-import { toggleDayOfWeek } from '../../actions/time';
+import {
+  setSelectedDate,
+  setWeekPageByIndex,
+  setDayPageByIndex
+} from '../../actions/time';
 import { STATUS_BAR_HEIGHT } from '../../shared/styles';
 
 import TimeHeader from './TimeHeader';
@@ -30,58 +34,78 @@ const moment = extendMoment(Moment);
 
 const WEEKS_TO_LOAD = 10;
 
-const styles = {
-  loadingWeeks: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+class WeekPageComponent extends React.Component {
+
+  static propTypes = {
+    page: PropTypes.number.isRequired,
+    weekPages: PropTypes.array.isRequired,
+  };
+
+  render() {
+    const { page, weekPages } = this.props;
+    return <View style={{flex: 1}}>
+      <Text>{weekPages[page]}</Text>
+      <Text>Week {page}</Text>
+    </View>
   }
-};
 
-const WeekRendererComponent = ({ loaded, week, selectedDayOfWeek, dispatch }) => {
-  return (<View style={{flex: 1}}>
-    {
-      !loaded && <View style={{flex: 1, flexDirection: 'row'}}>
-        {(Array.from(week.range.by('day')).map((day, counter) => {
-          console.log(day.isSame(moment()));
-          let dayBackgroundStyle = { width: 32, height: 32, borderRadius: 16 };
-          let dayTextStyle = { color: 'black' };
-          if (day.day() === selectedDayOfWeek) {
-            if (moment().format('YYYY-MM-DD') === day.format('YYYY-MM-DD')) {
-              dayBackgroundStyle.backgroundColor = '#79dea8';
-              dayTextStyle.color = 'white';
-            } else {
-              dayBackgroundStyle.backgroundColor = 'black';
-              dayTextStyle.color = 'white';
-            }
-          }
-          return <View style={{width: '14.28%', height: '100%'}} key={`day-${day.format('YYYY-MM-DD')}`}>
-            <TouchableOpacity style={{flex: 1, alignItems: 'center', justifyContent: 'center'}} onPress={() => {
-              dispatch(toggleDayOfWeek(day.day()))
-            }}>
-              <View style={dayBackgroundStyle}>
-                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                  <Text style={dayTextStyle}>{day.format('dddd')[0]}</Text>
-                </View>
-              </View>
-              <Text style={{fontSize: 10, paddingTop: 4}}>0:00</Text>
-            </TouchableOpacity>
-          </View>
-        }))}
-      </View>
-    }
-  </View>)
-};
+}
 
-const WeekRenderer = connect(({ time }) => {
+const WeekPage = connect(({ time }) => {
   return {
-    selectedDayOfWeek: time.selectedDayOfWeek,
+    weekPages: time.weekPages,
   }
-})(WeekRendererComponent);
+})(WeekPageComponent);
+
+class DayPageComponent extends React.Component {
+
+  static propTypes = {
+    page: PropTypes.number.isRequired,
+    dayPages: PropTypes.array.isRequired,
+  };
+
+  render() {
+    const { page, dayPages } = this.props;
+    console.log('rendering day/page ', page);
+    return <View style={{flex: 1}}>
+      <Text>{dayPages[page]}</Text>
+      <Text>Day {page}</Text>
+    </View>
+  }
+
+}
+
+const DayPage = connect(({ time }) => {
+  return {
+    dayPages: time.dayPages,
+  }
+})(DayPageComponent);
+
+class WeekSwiper extends React.PureComponent {
+
+  render() {
+
+    console.log('RENDERING');
+
+    return <Swiper ref={this.props.swiperRef}
+                   showsButtons={false} showsPagination={false} loop={true}
+                   onScrollBeginDrag={this.props.onDraggedWeek}
+                   onMomentumScrollEnd={this.props.onScrollEndWeek}>
+      <View style={{flex: 1}}>
+        {this.props.pageType === 'week' ? <WeekPage page={0}/> : <DayPage page={0}/>}
+      </View>
+      <View style={{flex: 1}}>
+        {this.props.pageType === 'week' ? <WeekPage page={1}/> : <DayPage page={1}/>}
+      </View>
+      <View style={{flex: 1}}>
+        {this.props.pageType === 'week' ? <WeekPage page={2}/> : <DayPage page={2}/>}
+      </View>
+    </Swiper>
+  }
+
+}
 
 class TimeScreenClass extends React.Component {
-
-  static propTypes = {};
 
   static propTypes = {
     navigation: PropTypes.object.isRequired,
@@ -89,94 +113,127 @@ class TimeScreenClass extends React.Component {
 
   constructor(props) {
     super(props);
-    this.currentIndex = 0;
-    this.state = {
-      loadingWeeks: true,
-      weeks: [],
-      loadQueue: [],
-      selectedDayOfWeek: moment().day(),
-    }
+    this.weekIndex = 0;
+    this.dayIndex = 0;
   }
 
-  loadWeeksForDate = (momentDate) => {
-    this.setState({
-      loadingWeeks: true,
-    }, () => {
-      setTimeout(() => {
-        const startDay = moment(momentDate.day(1));
-        const endDay = moment(momentDate.day(7));
-        const startingRange = moment.range(startDay, endDay);
-        let forwardWeeks = [{
-          range: startingRange,
-        }];
-        let backwardWeeks = [];
-        for (let i = 0; i < WEEKS_TO_LOAD; i++) {
-          forwardWeeks.push({
-            range: moment.range(moment(startingRange.start).add(i * 7 + 7, 'days'), moment(startingRange.end).add(i * 7 + 7, 'days'))
-          });
-          backwardWeeks.push({
-            range: moment.range(moment(startingRange.start).add((i - 1) * 7 - (WEEKS_TO_LOAD - 1) * 7, 'days'), moment(startingRange.end).add((i - 1) * 7 - (WEEKS_TO_LOAD - 1) * 7, 'days'))
-          });
-        }
-        console.log(forwardWeeks);
-        console.log(backwardWeeks);
-        const finalWeeks = forwardWeeks.concat(backwardWeeks);
-        this.setState({
-          loadingWeeks: false,
-          weeks: finalWeeks,
-          loadQueue: finalWeeks.map(() => 0),
-        })
-      }, 0);
-    });
+  weekSwiperRef = (ref) => {
+    this.weekSwiper = ref;
   };
 
-  componentWillMount() {
-    this.props.dispatch(toggleDayOfWeek(moment().day()));
-  }
-
-  componentDidMount() {
-    this.loadWeeksForDate(moment());
-  }
-
-  loadHandle = (i) => {
-    let loadQueue = this.state.loadQueue;
-    loadQueue[i] = 1;
-    this.setState({
-      loadQueue
-    })
+  _getSwiperIndicies = (previousSwiperIndex, swiperState) => {
+    let currentIndex, nextIndex, previousIndex, direction;
+    if (swiperState.index === swiperState.total - 1 && previousSwiperIndex === 0) {
+      // Backward but from beginning (looped)
+      currentIndex = swiperState.total - 1;
+      nextIndex = 0;
+      previousIndex = swiperState.total - 2;
+      direction = -1;
+    } else if (swiperState.index === 0 && previousSwiperIndex === swiperState.total - 1) {
+      // Forward but from end (looped)
+      currentIndex = 0;
+      nextIndex = 1;
+      previousIndex = swiperState.total - 1;
+      direction = 1;
+    } else if (swiperState.index === swiperState.total - 1 && previousSwiperIndex === swiperState.total - 2) {
+      // Forward but to end
+      currentIndex = swiperState.total - 1;
+      nextIndex = 0;
+      previousIndex = swiperState.total - 2;
+      direction = 1;
+    } else if (swiperState.index === 0 && previousSwiperIndex === 1) {
+      // Backward but to beginning
+      currentIndex = 0;
+      nextIndex = 1;
+      previousIndex = swiperState.total - 1;
+      direction = -1;
+    } else {
+      // Generic forward/backward item
+      currentIndex = swiperState.index;
+      nextIndex = swiperState.index + 1;
+      previousIndex = swiperState.index - 1
+      direction = (swiperState.index > previousSwiperIndex) ? 1 : -1;
+    }
+    if (nextIndex >= swiperState.total) {
+      nextIndex = 0;
+    }
+    if (previousIndex < 0) {
+      previousIndex = swiperState.total - 1;
+    }
+    return {
+      current: currentIndex,
+      next: nextIndex,
+      previous: previousIndex,
+      direction,
+    }
   };
 
-  onMomentumScrollEnd = (e, state, context) => {
-    if (state.index == WEEKS_TO_LOAD || state.index == (WEEKS_TO_LOAD + 1)) {
-      this.loadWeeksForDate(moment(this.state.weeks[state.index].range.start));
+  onDraggedWeek = () => {
+    this.draggingWeek = true;
+  };
+
+  onScrollEndWeek = (e, state, context) => {
+    if (this.draggingWeek) {
+      const weekIndicies = this._getSwiperIndicies(this.weekIndex, this.weekSwiper.state);
+      const dayIndicies = this._getSwiperIndicies(this.dayIndex, this.daySwiper.state);
+      const setDayIndex = (weekIndicies.direction === 1) ? dayIndicies.next : dayIndicies.previous;
+      const newSelectedDate = moment(this.props.dayPages[dayIndicies.current], 'YYYY-MM-DD').add(weekIndicies.direction * 7, 'days').format('YYYY-MM-DD');
+      this.props.dispatch(setSelectedDate(newSelectedDate));
+      this.props.dispatch(setDayPageByIndex(setDayIndex, newSelectedDate));
+      this.daySwiper.scrollBy(weekIndicies.direction, true);
     }
+    this.weekIndex = state.index;
+    this.draggingWeek = false;
+    // Update the week swipers since the day has been updated
+    const finalWeekIndicies = this._getSwiperIndicies(this.weekIndex, this.weekSwiper.state);
+    const currentWeekDate = moment(this.props.weekPages[finalWeekIndicies.current], 'YYYY-MM-DD');
+    this.props.dispatch(setWeekPageByIndex(finalWeekIndicies.next, currentWeekDate.clone().add(7, 'days').format('YYYY-MM-DD')));
+    this.props.dispatch(setWeekPageByIndex(finalWeekIndicies.previous, currentWeekDate.clone().add(-7, 'days').format('YYYY-MM-DD')));
+  };
+
+  onScrollEndDay = (e, state, context) => {
+    if (this.draggingDay) {
+      //this.props.dispatch(goToDate(moment(this.props.selectedDate, 'YYYY-MM-DD').add(1, 'days')));
+      //console.log('SET PAGES')
+    }
+    this.dayIndex = state.index;
+    this.draggingDay = false;
+    // Update the day swipers since the day has been updated
+    const finalDayIndicies = this._getSwiperIndicies(this.dayIndex, this.daySwiper.state);
+    const currentDayDate = moment(this.props.dayPages[finalDayIndicies.current], 'YYYY-MM-DD');
+    this.props.dispatch(setDayPageByIndex(finalDayIndicies.next, currentDayDate.clone().add(1, 'days').format('YYYY-MM-DD')));
+    this.props.dispatch(setDayPageByIndex(finalDayIndicies.previous, currentDayDate.clone().add(-1, 'days').format('YYYY-MM-DD')));
+  };
+
+  daySwiperRef = (ref) => {
+    this.daySwiper = ref;
+  };
+
+  onDraggedDay = () => {
+    this.draggingDay = true;
   };
 
   render() {
-    const { loadingWeeks } = this.state;
     return (
       <View style={{flex: 1}}>
         <TimeHeader navigation={this.props.navigation}/>
         <View style={{marginTop: STATUS_BAR_HEIGHT + 50, height: 65, backgroundColor: '#cde6d9'}}>
-          {loadingWeeks ? <View style={styles.loadingWeeks}><ActivityIndicator /></View> :
-            <Swiper loadMinimal loadMinimalSize={1} showsButtons={false}
-                    showsPagination={false} loop={true}
-                    onMomentumScrollEnd={this.onMomentumScrollEnd}>
-              {this.state.weeks.map((week, weekCounter) => <WeekRenderer
-                loadHandle={this.loadHandle}
-                loaded={!!this.state.loadQueue[weekCounter]}
-                week={week}
-                index={weekCounter}
-                key={week.range.start.format('YYYY-MM-DDDD')}
-              />)}
-            </Swiper>
-          }
+          <WeekSwiper pageType="week" swiperRef={this.weekSwiperRef}
+                      onDraggedWeek={this.onDraggedWeek}
+                      onScrollEndWeek={this.onScrollEndWeek}/>
+        </View>
+        <View style={{flex: 1}}>
+          <WeekSwiper pageType="day" swiperRef={this.daySwiperRef} onDraggedWeek={this.onDraggedDay}
+                      onScrollEndWeek={this.onScrollEndDay}/>
         </View>
       </View>
     );
   }
 }
 
-export default TimeScreen = connect(({ home }) => {
-  return {}
+export default TimeScreen = connect(({ time }) => {
+  return {
+    dayPages: time.dayPages,
+    weekPages: time.weekPages,
+  }
 })(TimeScreenClass);
